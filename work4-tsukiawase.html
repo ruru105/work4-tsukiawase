@@ -1,0 +1,1548 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>つきあわせ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f7f7f5;
+    --fg: #1a1a1a;
+    --fg-muted: #6b6b6b;
+    --surface: #ffffff;
+    --border: #e0e0dc;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --only-a: #fef3c7;
+    --only-a-border: #f59e0b;
+    --only-b: #dbeafe;
+    --only-b-border: #3b82f6;
+    --diff: #fee2e2;
+    --diff-border: #ef4444;
+    --check: #fef9c3;
+    --check-border: #eab308;
+    --ok: #dcfce7;
+    --ok-border: #22c55e;
+    --sev-critical: #dc2626;
+    --sev-critical-bg: #fef2f2;
+    --sev-warning: #d97706;
+    --sev-warning-bg: #fffbeb;
+    --sev-info: #2563eb;
+    --sev-info-bg: #eff6ff;
+    --font-body: 'Noto Sans JP', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1a1a1e;
+      --fg: #e8e8e4;
+      --fg-muted: #9a9a96;
+      --surface: #26262a;
+      --border: #3a3a3e;
+      --accent: #60a5fa;
+      --accent-light: #1e3a5f;
+      --only-a: #422006;
+      --only-a-border: #d97706;
+      --only-b: #1e3a5f;
+      --only-b-border: #60a5fa;
+      --diff: #450a0a;
+      --diff-border: #f87171;
+      --check: #422006;
+      --check-border: #facc15;
+      --ok: #052e16;
+      --ok-border: #4ade80;
+      --sev-critical: #f87171;
+      --sev-critical-bg: #450a0a;
+      --sev-warning: #fbbf24;
+      --sev-warning-bg: #422006;
+      --sev-info: #60a5fa;
+      --sev-info-bg: #1e3a5f;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1a1a1e;
+    --fg: #e8e8e4;
+    --fg-muted: #9a9a96;
+    --surface: #26262a;
+    --border: #3a3a3e;
+    --accent: #60a5fa;
+    --accent-light: #1e3a5f;
+    --only-a: #422006;
+    --only-a-border: #d97706;
+    --only-b: #1e3a5f;
+    --only-b-border: #60a5fa;
+    --diff: #450a0a;
+    --diff-border: #f87171;
+    --check: #422006;
+    --check-border: #facc15;
+    --ok: #052e16;
+    --ok-border: #4ade80;
+    --sev-critical: #f87171;
+    --sev-critical-bg: #450a0a;
+    --sev-warning: #fbbf24;
+    --sev-warning-bg: #422006;
+    --sev-info: #60a5fa;
+    --sev-info-bg: #1e3a5f;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-inline: 16px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.3rem;
+    text-wrap: balance;
+  }
+  .subtitle {
+    color: var(--fg-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Pipeline indicator */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .pipeline-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+    transition: all 0.3s;
+  }
+  .pipeline-step.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .pipeline-step.done {
+    background: var(--ok);
+    border-color: var(--ok-border);
+    color: #166534;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .pipeline-step.done { color: #86efac; }
+  }
+  :root[data-theme="dark"] .pipeline-step.done { color: #86efac; }
+  .pipeline-arrow {
+    margin: 0 6px;
+    color: var(--fg-muted);
+    font-size: 0.7rem;
+  }
+  .pipeline-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--fg-muted);
+    font-size: 0.7rem;
+  }
+  .pipeline-step.active .pipeline-num {
+    background: var(--accent);
+    color: #fff;
+  }
+  .pipeline-step.done .pipeline-num {
+    background: var(--ok-border);
+    color: #fff;
+  }
+
+  .drop-zone-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 600px) {
+    .drop-zone-wrap { grid-template-columns: 1fr; }
+    .pipeline { font-size: 0.7rem; }
+    .pipeline-step { padding: 0.3rem 0.5rem; }
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--surface);
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .drop-zone.loaded {
+    border-color: var(--ok-border);
+    border-style: solid;
+  }
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .drop-zone .label {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+  .drop-zone .hint {
+    color: var(--fg-muted);
+    font-size: 0.8rem;
+  }
+  .drop-zone .file-info {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ok-border);
+  }
+
+  /* Cleaning report */
+  .clean-report {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+    display: none;
+    font-size: 0.85rem;
+  }
+  .clean-report.show { display: block; }
+  .clean-report h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 0 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .clean-table-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 0.3rem 0;
+  }
+  .clean-table-label {
+    font-weight: 600;
+    min-width: 40px;
+  }
+  .clean-ok { color: var(--ok-border); }
+  .clean-warn { color: var(--sev-warning); }
+  .clean-issue {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+    padding-left: 48px;
+  }
+
+  .actions {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .btn {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.7rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    transition: opacity 0.2s;
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .key-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+  .key-select.show { display: block; }
+  .key-select h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.6rem;
+  }
+  .key-select .cols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .key-select .col-chip {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    background: var(--surface);
+    transition: all 0.15s;
+  }
+  .key-select .col-chip.selected {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .price-config {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+  .price-config.show { display: block; }
+  .price-config h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.6rem;
+  }
+  .price-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+  }
+  .price-row input {
+    width: 100px;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  /* Triage summary */
+  .triage-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 0.6rem;
+  }
+  .triage-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--surface);
+    border-left: 4px solid;
+  }
+  .triage-card.t-critical { border-color: var(--sev-critical); }
+  .triage-card.t-warning { border-color: var(--sev-warning); }
+  .triage-card.t-info { border-color: var(--sev-info); }
+  .triage-card.t-ok { border-color: var(--ok-border); }
+  .triage-num { font-size: 1.3rem; }
+  .sev-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sev-dot-critical { background: var(--sev-critical); }
+  .sev-dot-warning { background: var(--sev-warning); }
+  .sev-dot-info { background: var(--sev-info); }
+  .sev-dot-ok { background: var(--ok-border); }
+
+  /* Category breakdown */
+  .category-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+  }
+  .cat-tag {
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+  }
+
+  /* Results table */
+  #results { display: none; }
+  #results.show { display: block; }
+  .results-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    background: var(--surface);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr.row-ok { background: var(--ok); }
+  tr.row-only-a { background: var(--only-a); }
+  tr.row-only-b { background: var(--only-b); }
+  tr.row-diff { background: var(--diff); }
+  tr.row-check { background: var(--check); }
+
+  .reason {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+    font-style: italic;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .badge-ok { background: var(--ok); color: #166534; }
+  .badge-only-a { background: var(--only-a); color: #92400e; }
+  .badge-only-b { background: var(--only-b); color: #1e40af; }
+  .badge-diff { background: var(--diff); color: #991b1b; }
+  .badge-check { background: var(--check); color: #854d0e; }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .badge-ok { color: #86efac; }
+    :root:not([data-theme="light"]) .badge-only-a { color: #fbbf24; }
+    :root:not([data-theme="light"]) .badge-only-b { color: #93c5fd; }
+    :root:not([data-theme="light"]) .badge-diff { color: #fca5a5; }
+    :root:not([data-theme="light"]) .badge-check { color: #fde047; }
+  }
+  :root[data-theme="dark"] .badge-ok { color: #86efac; }
+  :root[data-theme="dark"] .badge-only-a { color: #fbbf24; }
+  :root[data-theme="dark"] .badge-only-b { color: #93c5fd; }
+  :root[data-theme="dark"] .badge-diff { color: #fca5a5; }
+  :root[data-theme="dark"] .badge-check { color: #fde047; }
+
+  /* Action tags */
+  .action-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .action-critical {
+    background: var(--sev-critical-bg);
+    color: var(--sev-critical);
+  }
+  .action-warning {
+    background: var(--sev-warning-bg);
+    color: var(--sev-warning);
+  }
+  .action-info {
+    background: var(--sev-info-bg);
+    color: var(--sev-info);
+  }
+  .action-ok {
+    background: var(--ok);
+    color: var(--ok-border);
+  }
+
+  .note {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+    margin-top: 1rem;
+  }
+
+  /* Quality banner */
+  .quality-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .quality-banner.show { display: flex; }
+  .quality-banner.banner-ok {
+    background: var(--ok);
+    border: 1px solid var(--ok-border);
+    color: #166534;
+  }
+  .quality-banner.banner-warn {
+    background: var(--sev-warning-bg);
+    border: 1px solid var(--sev-warning);
+    color: #92400e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .quality-banner.banner-ok { color: #86efac; }
+    :root:not([data-theme="light"]) .quality-banner.banner-warn { color: #fbbf24; }
+  }
+  :root[data-theme="dark"] .quality-banner.banner-ok { color: #86efac; }
+  :root[data-theme="dark"] .quality-banner.banner-warn { color: #fbbf24; }
+  .quality-banner .banner-icon { font-size: 1.3rem; }
+  .quality-banner .banner-detail {
+    font-weight: 400;
+    font-size: 0.8rem;
+    margin-left: auto;
+    opacity: 0.8;
+  }
+
+  /* Result action buttons */
+  .result-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0.8rem;
+  }
+  .btn-sm {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    background: var(--surface);
+    color: var(--fg);
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .btn-sm:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .btn-sm.copied {
+    border-color: var(--ok-border);
+    color: var(--ok-border);
+  }
+</style>
+
+<h1>つきあわせ</h1>
+<p class="subtitle">2つの表を検査・突き合わせ・仕分けします。データはブラウザ内で完結します。</p>
+
+<div class="pipeline" id="pipeline">
+  <div class="pipeline-step" id="step1">
+    <span class="pipeline-num">1</span> 検査
+  </div>
+  <span class="pipeline-arrow">▸</span>
+  <div class="pipeline-step" id="step2">
+    <span class="pipeline-num">2</span> 突き合わせ
+  </div>
+  <span class="pipeline-arrow">▸</span>
+  <div class="pipeline-step" id="step3">
+    <span class="pipeline-num">3</span> 仕分け
+  </div>
+</div>
+
+<div class="drop-zone-wrap">
+  <div class="drop-zone" id="dropA">
+    <input type="file" accept=".csv" id="fileA">
+    <div class="label">表A</div>
+    <div class="hint">CSVファイルをドロップ、またはクリック</div>
+    <div class="file-info" id="infoA"></div>
+  </div>
+  <div class="drop-zone" id="dropB">
+    <input type="file" accept=".csv" id="fileB">
+    <div class="label">表B</div>
+    <div class="hint">CSVファイルをドロップ、またはクリック</div>
+    <div class="file-info" id="infoB"></div>
+  </div>
+</div>
+
+<div style="text-align:center;margin:0.5rem 0 1rem">
+  <button class="btn-sm" id="demoBtn" onclick="loadDemo()" style="font-size:0.95rem;padding:0.5rem 1.2rem">▶ サンプルデータで試す</button>
+</div>
+
+<div class="quality-banner" id="qualityBanner">
+  <span class="banner-icon"></span>
+  <span class="banner-text"></span>
+  <span class="banner-detail"></span>
+</div>
+
+<div class="clean-report" id="cleanReport">
+  <h3>📋 データ検査結果</h3>
+  <div id="cleanBody"></div>
+</div>
+
+<div class="key-select" id="keySelect">
+  <h3>突き合わせのキー列を選んでください（複数可）</h3>
+  <div class="cols" id="keyCols"></div>
+  <p style="font-size:0.8rem;color:var(--fg-muted);margin:0.5rem 0 0">同じ人を判断するために使う列を選びます</p>
+</div>
+
+<div class="price-config" id="priceConfig">
+  <h3>料金表（任意）ーコースと金額の照合に使います</h3>
+  <div id="priceRows"></div>
+  <p style="font-size:0.8rem;color:var(--fg-muted);margin:0.5rem 0 0">空欄でもOK。設定すると金額の過不足も検出します</p>
+</div>
+
+<div class="actions">
+  <button class="btn" id="runBtn" disabled>つきあわせ実行</button>
+</div>
+
+<div id="results">
+  <div class="triage-summary" id="triageSummary"></div>
+  <div class="category-breakdown" id="categoryBreakdown"></div>
+  <div class="result-actions" id="resultActions">
+    <button class="btn-sm" id="btnCopy" onclick="copyResultsToClipboard()">📋 結果をコピー</button>
+  </div>
+  <div class="results-table-wrap">
+    <table id="resultsTable">
+      <thead id="resultHead"></thead>
+      <tbody id="resultBody"></tbody>
+    </table>
+  </div>
+  <div class="note">
+    このツールの結論はすべて「要確認」です。最終判断は人がします。<br>
+    対応候補はルールに基づく提案であり、割引・分割払い等の事情は考慮されていません。<br>
+    データはブラウザの中だけで処理され、外部には送信されません。
+  </div>
+</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Step 0 ── CSV Parser
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function parseCSV(text) {
+  // Remove BOM if present
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const rows = [];
+  for (const line of lines) {
+    if (line.trim() === '') continue;
+    const cells = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inQuotes) {
+        if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
+        else if (ch === '"') { inQuotes = false; }
+        else { current += ch; }
+      } else {
+        if (ch === '"') { inQuotes = true; }
+        else if (ch === ',') { cells.push(current); current = ''; }
+        else { current += ch; }
+      }
+    }
+    cells.push(current);
+    rows.push(cells.map(c => c.trim()));
+  }
+  return { headers: rows[0] || [], data: rows.slice(1) };
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Step 1 ── データ検査（作品1の考え方）
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function cleanData(parsed) {
+  const report = { original: parsed.data.length, issues: [] };
+  const expectedCols = parsed.headers.length;
+
+  // 1. Column count consistency — pad short rows, flag long ones
+  parsed.data.forEach((row, i) => {
+    if (row.length < expectedCols) {
+      while (row.length < expectedCols) row.push('');
+      report.issues.push({ type: 'fixed', msg: (i + 2) + '行目: 列数不足を補完（' + row.length + '→' + expectedCols + '列）' });
+    } else if (row.length > expectedCols) {
+      report.issues.push({ type: 'warn', msg: (i + 2) + '行目: 列数超過（' + row.length + '列、期待' + expectedCols + '列）' });
+    }
+  });
+
+  // 2. Exact duplicate rows
+  const seen = new Set();
+  const before = parsed.data.length;
+  parsed.data = parsed.data.filter(row => {
+    const key = row.join('\t');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  const removed = before - parsed.data.length;
+  if (removed > 0) {
+    report.issues.push({ type: 'fixed', msg: '完全重複 ' + removed + '行を除去' });
+  }
+
+  // 3. Blank rows (all cells empty)
+  const blankBefore = parsed.data.length;
+  parsed.data = parsed.data.filter(row => row.some(c => c !== ''));
+  const blankRemoved = blankBefore - parsed.data.length;
+  if (blankRemoved > 0) {
+    report.issues.push({ type: 'fixed', msg: '空行 ' + blankRemoved + '行を除去' });
+  }
+
+  report.final = parsed.data.length;
+  return report;
+}
+
+function showCleanReport(reportA, reportB) {
+  const panel = document.getElementById('cleanReport');
+  const body = document.getElementById('cleanBody');
+
+  function renderOne(report, label) {
+    let html = '<div class="clean-table-row">';
+    html += '<span class="clean-table-label">' + label + '</span>';
+    html += '<span>' + report.final + '行';
+    if (report.original !== report.final) {
+      html += '（元' + report.original + '行）';
+    }
+    if (report.issues.length === 0) {
+      html += ' <span class="clean-ok">── 問題なし ✓</span>';
+    } else {
+      const fixed = report.issues.filter(i => i.type === 'fixed').length;
+      const warn = report.issues.filter(i => i.type === 'warn').length;
+      let parts = [];
+      if (fixed) parts.push(fixed + '件修正');
+      if (warn) parts.push(warn + '件注意');
+      html += ' <span class="clean-warn">── ' + parts.join('、') + '</span>';
+    }
+    html += '</span></div>';
+
+    for (const issue of report.issues) {
+      const icon = issue.type === 'fixed' ? '✓' : '⚠';
+      html += '<div class="clean-issue">' + icon + ' ' + issue.msg + '</div>';
+    }
+    return html;
+  }
+
+  body.innerHTML = renderOne(reportA, '表A') + renderOne(reportB, '表B');
+  panel.classList.add('show');
+
+  // Quality banner
+  const banner = document.getElementById('qualityBanner');
+  const bannerIcon = banner.querySelector('.banner-icon');
+  const bannerText = banner.querySelector('.banner-text');
+  const bannerDetail = banner.querySelector('.banner-detail');
+  const allOk = reportA.issues.length === 0 && reportB.issues.length === 0;
+
+  banner.classList.remove('banner-ok', 'banner-warn');
+  if (allOk) {
+    banner.classList.add('banner-ok');
+    bannerIcon.textContent = '✅';
+    bannerText.textContent = 'データ品質: 問題ありません';
+    bannerDetail.textContent = '表A ' + reportA.final + '行 ・ 表B ' + reportB.final + '行';
+  } else {
+    const totalIssues = reportA.issues.length + reportB.issues.length;
+    banner.classList.add('banner-warn');
+    bannerIcon.textContent = '⚠️';
+    bannerText.textContent = 'データ品質: ' + totalIssues + '件の指摘があります';
+    bannerDetail.textContent = '下の検査結果を確認してください';
+  }
+  banner.classList.add('show');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Normalize for matching
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function normalize(s) {
+  if (typeof s !== 'string') return String(s);
+  return s
+    .normalize('NFKC')
+    .replace(/[\s　]+/g, '')
+    .replace(/[ー\-−–—]/g, '-')
+    .toLowerCase();
+}
+
+const KANJI_VARIANTS = [
+  ['龍', '竜'], ['澤', '沢'], ['邊', '辺', '邉'], ['齋', '斎', '齊'],
+  ['櫻', '桜'], ['學', '学'], ['國', '国'], ['廣', '広'], ['惠', '恵'],
+  ['萬', '万'], ['眞', '真'], ['與', '与'], ['鐵', '鉄'], ['靜', '静'],
+  ['ゆうこ', '裕子', '優子', '祐子', '悠子', '有子', '夕子'],
+  ['りゅういち', '龍一', '竜一', '隆一', '流一'],
+];
+
+function kanjiNormalize(s) {
+  let result = normalize(s);
+  for (const group of KANJI_VARIANTS) {
+    const base = group[0];
+    for (let i = 1; i < group.length; i++) {
+      result = result.replace(new RegExp(group[i], 'g'), base);
+    }
+  }
+  return result;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// State
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let dataA = null, dataB = null;
+let selectedKeys = [];
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// File loading
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function setupDrop(zoneId, inputId, infoId, which) {
+  const zone = document.getElementById(zoneId);
+  const input = document.getElementById(inputId);
+  const info = document.getElementById(infoId);
+
+  function handleFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const parsed = parseCSV(e.target.result);
+      if (which === 'A') dataA = parsed;
+      else dataB = parsed;
+      zone.classList.add('loaded');
+      info.textContent = file.name + ' (' + parsed.data.length + '行)';
+      checkReady();
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  input.addEventListener('change', () => handleFile(input.files[0]));
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    handleFile(e.dataTransfer.files[0]);
+  });
+}
+
+setupDrop('dropA', 'fileA', 'infoA', 'A');
+setupDrop('dropB', 'fileB', 'infoB', 'B');
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// デモデータ（架空のカルチャースクール申込名簿と入金記録）
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const DEMO_CSV_A = `氏名,コース,金額,電話番号
+田中美咲,上級,12000,090-1234-5678
+鈴木一郎,中級,8000,080-2345-6789
+佐藤花子,初級,5000,03-3456-7890
+高橋龍太,中級,8000,070-4567-8901
+渡辺ゆうこ,上級,12000,090-5678-9012
+伊藤誠,初級,5000,080-6789-0123
+小林さやか,中級,8000,070-7890-1234
+山本太郎,中級,8000,090-8901-2345
+中村あかね,初級,5000,080-9012-3456
+加藤雄大,上級,12000,070-0123-4567
+吉田真理,中級,8000,090-1111-2222
+佐藤花子,上級,12000,080-3333-4444`;
+
+const DEMO_CSV_B = `名前,コース,金額,TEL
+田中美咲,上級,10000,090-1234-5678
+鈴木一郎,中級,8000,080-2345-6789
+佐藤花子,初級,5000,東京都渋谷区
+高橋竜太,中級,8000,070-4567-8901
+渡辺裕子,上級,12000,090-5678-9012
+伊藤誠,初級,5000,080-6789-0123
+伊藤誠,初級,5000,080-6789-0123
+小林さやか,中級,6000,070-7890-1234
+山本太郎,中級,8000,090-8901-2345
+中村あかね,初級,5000,080-9012-3456
+吉田真理,中級,10000,090-1111-2222
+佐藤花子,上級,12000,080-3333-4444
+松井健太,初級,5000,090-4444-5555`;
+
+// デモの特徴:
+// 田中美咲: 金額過少（12000→10000）── 要対応
+// 小林さやか: 金額過少（8000→6000）── 要対応
+// 吉田真理: 金額過多（8000→10000）── 要対応
+// 高橋龍太↔竜太: 漢字の表記ゆれ（龍/竜）── 正規化で一致
+// 渡辺ゆうこ↔裕子: 読みの表記ゆれ── 正規化で一致
+// 佐藤花子: 同姓同名（初級+上級の2名）── 同姓同名検出
+// 佐藤花子(初級)のTEL欄に住所 ── 電話列の入力ミス検出
+// 加藤雄大: 表Aのみ存在 ── 未入金
+// 松井健太: 表Bのみ存在 ── 照合不能
+// 列名: 氏名↔名前, 電話番号↔TEL ── シノニムマッピング
+
+function loadDemo() {
+  dataA = parseCSV(DEMO_CSV_A);
+  dataB = parseCSV(DEMO_CSV_B);
+
+  const dropA = document.getElementById('dropA');
+  const dropB = document.getElementById('dropB');
+  dropA.classList.add('loaded');
+  dropB.classList.add('loaded');
+  document.getElementById('infoA').textContent = 'サンプル: 申込名簿 (' + dataA.data.length + '行)';
+  document.getElementById('infoB').textContent = 'サンプル: 入金記録 (' + dataB.data.length + '行)';
+
+  // デモボタンを非表示
+  document.getElementById('demoBtn').hidden = true;
+
+  // Step 1: 検査
+  const reportA = cleanData(dataA);
+  const reportB = cleanData(dataB);
+  showCleanReport(reportA, reportB);
+  setPipelineStep(1);
+  showKeySelect();
+
+  // 自動でキー列「氏名」を選択
+  const chips = document.querySelectorAll('#keyCols .col-chip');
+  chips.forEach(chip => {
+    if (chip.textContent === '氏名' || chip.textContent === '名前') {
+      chip.classList.add('selected');
+      if (!selectedKeys.includes(chip.textContent)) {
+        selectedKeys.push(chip.textContent);
+      }
+    }
+  });
+
+  // 料金表に金額を自動入力
+  setTimeout(() => {
+    const priceInputs = document.querySelectorAll('#priceRows input[data-category]');
+    const priceMap = { '初級': 5000, '中級': 8000, '上級': 12000 };
+    priceInputs.forEach(input => {
+      const cat = input.getAttribute('data-category');
+      if (priceMap[cat] !== undefined) {
+        input.value = priceMap[cat];
+      }
+    });
+
+    // 実行ボタンを有効化して自動実行
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('runBtn').click();
+  }, 100);
+}
+
+function checkReady() {
+  if (dataA && dataB) {
+    // Step 1: Run cleaning
+    const reportA = cleanData(dataA);
+    const reportB = cleanData(dataB);
+    showCleanReport(reportA, reportB);
+
+    // Update file info with post-clean counts
+    document.getElementById('infoA').textContent =
+      document.getElementById('infoA').textContent.replace(/\d+行/, dataA.data.length + '行');
+    document.getElementById('infoB').textContent =
+      document.getElementById('infoB').textContent.replace(/\d+行/, dataB.data.length + '行');
+
+    setPipelineStep(1);
+    showKeySelect();
+    document.getElementById('runBtn').disabled = false;
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Pipeline indicator
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function setPipelineStep(step) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step' + i);
+    el.classList.remove('active', 'done');
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('done');
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Key column & price config
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function showKeySelect() {
+  const panel = document.getElementById('keySelect');
+  const container = document.getElementById('keyCols');
+  container.innerHTML = '';
+
+  const allHeaders = [...new Set([...dataA.headers, ...dataB.headers])];
+  selectedKeys = [];
+
+  allHeaders.forEach(h => {
+    const chip = document.createElement('button');
+    chip.className = 'col-chip';
+    chip.textContent = h;
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('selected');
+      if (chip.classList.contains('selected')) {
+        selectedKeys.push(h);
+      } else {
+        selectedKeys = selectedKeys.filter(k => k !== h);
+      }
+    });
+    container.appendChild(chip);
+  });
+
+  panel.classList.add('show');
+  detectPriceColumns();
+}
+
+function detectPriceColumns() {
+  const panel = document.getElementById('priceConfig');
+  const container = document.getElementById('priceRows');
+  container.innerHTML = '';
+
+  const allHeaders = [...new Set([...dataA.headers, ...dataB.headers])];
+  const priceKeywords = ['金額', '料金', '価格', '合計', 'amount', 'price'];
+  const categoryKeywords = ['コース', 'カテゴリ', '種別', 'type', 'course', 'plan'];
+
+  const hasPriceLike = allHeaders.some(h => priceKeywords.some(k => h.includes(k)));
+  const hasCategoryLike = allHeaders.some(h => categoryKeywords.some(k => h.includes(k)));
+
+  if (hasPriceLike && hasCategoryLike) {
+    const categories = new Set();
+    for (const table of [dataA, dataB]) {
+      const fIdx = table.headers.findIndex(h => categoryKeywords.some(k => h.includes(k)));
+      if (fIdx !== -1) {
+        table.data.forEach(row => { if (row[fIdx]) categories.add(row[fIdx]); });
+      }
+    }
+
+    if (categories.size > 0 && categories.size <= 20) {
+      [...categories].sort().forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'price-row';
+        div.innerHTML = '<span style="min-width:80px">' + cat + '</span> = <input type="number" data-category="' + cat + '" placeholder="金額"> 円';
+        container.appendChild(div);
+      });
+      panel.classList.add('show');
+    }
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Column matching (synonym mapping)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function findMatchingCol(headerA, headersB) {
+  if (headersB.includes(headerA)) return headerA;
+  const normA = normalize(headerA);
+  for (const hb of headersB) {
+    if (normalize(hb) === normA) return hb;
+  }
+  const synonyms = {
+    '氏名': ['名前', '名称', '名'],
+    '名前': ['氏名', '名称', '名'],
+    '電話番号': ['電話', 'TEL', 'tel'],
+    '電話': ['電話番号', 'TEL', 'tel'],
+  };
+  const syns = synonyms[headerA] || [];
+  for (const s of syns) {
+    if (headersB.includes(s)) return s;
+    for (const hb of headersB) {
+      if (normalize(hb) === normalize(s)) return hb;
+    }
+  }
+  return null;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Step 3 ── 仕分け（作品2の考え方）
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function classifyResult(r) {
+  if (r.type === 'ok') {
+    return { severity: 'ok', category: '一致', action: '—' };
+  }
+
+  // Classify each reason, take the highest severity
+  // Severity: 2=critical, 1=warning, 0=info
+  let maxSev = -1;
+  let topCategory = '要確認';
+  let topAction = '個別確認';
+
+  for (const reason of r.reasons) {
+    let sev = 0, cat = '', act = '';
+
+    if (reason.includes('表Aにのみ存在')) {
+      sev = 2; cat = '未入金'; act = '入金確認の連絡';  // includes 同姓同名の別人分
+    } else if (reason.includes('表Bにのみ存在')) {
+      sev = 1; cat = '照合不能'; act = '申込有無の確認';
+    } else if (reason.includes('過少')) {
+      sev = 2; cat = '金額不足'; act = '差額の案内';
+    } else if (reason.includes('過多')) {
+      sev = 2; cat = '金額過多'; act = '返金確認';
+    } else if (reason.includes('値が異なる')) {
+      sev = 1; cat = 'データ不一致'; act = '内容確認';
+    } else if (reason.includes('同姓同名') && reason.includes('判断できません')) {
+      sev = 1; cat = '同姓同名'; act = '本人確認';
+    } else if (reason.includes('電話列に電話番号でない')) {
+      sev = 1; cat = '入力ミス'; act = '入力修正';
+    } else if (reason.includes('表記ゆれ')) {
+      sev = 0; cat = '表記ゆれ'; act = 'データ統一';
+    } else {
+      continue;
+    }
+
+    if (sev > maxSev) {
+      maxSev = sev;
+      topCategory = cat;
+      topAction = act;
+    }
+  }
+
+  const sevMap = { 0: 'info', 1: 'warning', 2: 'critical' };
+  return {
+    severity: maxSev >= 0 ? sevMap[maxSev] : 'warning',
+    category: topCategory,
+    action: topAction
+  };
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Step 2 ── 突き合わせ（コア処理）
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+document.getElementById('runBtn').addEventListener('click', run);
+
+function run() {
+  if (!dataA || !dataB) return;
+  setPipelineStep(2);
+
+  // Build column mapping A→B
+  const colMap = {};
+  for (const ha of dataA.headers) {
+    const match = findMatchingCol(ha, dataB.headers);
+    if (match) colMap[ha] = match;
+  }
+
+  // Get price table
+  const priceTable = {};
+  document.querySelectorAll('#priceRows input[data-category]').forEach(inp => {
+    if (inp.value) priceTable[inp.dataset.category] = Number(inp.value);
+  });
+
+  // Determine key columns
+  let keyColsA = [];
+  if (selectedKeys.length > 0) {
+    keyColsA = selectedKeys.map(k => {
+      const idxA = dataA.headers.indexOf(k);
+      if (idxA !== -1) return { headerA: k, idxA, idxB: dataB.headers.indexOf(colMap[k] || k) };
+      const matchedA = Object.entries(colMap).find(([a, b]) => b === k);
+      if (matchedA) return { headerA: matchedA[0], idxA: dataA.headers.indexOf(matchedA[0]), idxB: dataB.headers.indexOf(k) };
+      return null;
+    }).filter(Boolean);
+  }
+
+  if (keyColsA.length === 0) {
+    const nameKeywords = ['氏名', '名前', '名称', '名'];
+    for (const ha of dataA.headers) {
+      if (nameKeywords.some(k => ha.includes(k))) {
+        const matchB = colMap[ha];
+        if (matchB) {
+          keyColsA.push({ headerA: ha, idxA: dataA.headers.indexOf(ha), idxB: dataB.headers.indexOf(matchB) });
+        }
+      }
+    }
+  }
+
+  function makeKey(row, indices) {
+    return indices.map(ki => kanjiNormalize(row[ki] || '')).join('|');
+  }
+
+  const idxA_keys = keyColsA.map(k => k.idxA);
+  const idxB_keys = keyColsA.map(k => k.idxB);
+
+  const groupA = {};
+  dataA.data.forEach((row, i) => {
+    const key = makeKey(row, idxA_keys);
+    if (!groupA[key]) groupA[key] = [];
+    groupA[key].push({ row, idx: i });
+  });
+
+  const groupB = {};
+  dataB.data.forEach((row, i) => {
+    const key = makeKey(row, idxB_keys);
+    if (!groupB[key]) groupB[key] = [];
+    groupB[key].push({ row, idx: i });
+  });
+
+  const results = [];
+  const matchedB = new Set();
+
+  for (const [key, aRows] of Object.entries(groupA)) {
+    const bRows = groupB[key] || [];
+
+    if (bRows.length === 0) {
+      for (const a of aRows) {
+        let fuzzyMatch = null;
+        for (const [bKey, bList] of Object.entries(groupB)) {
+          if (matchedB.has(bKey)) continue;
+          const phoneIdxA = dataA.headers.findIndex(h => h.includes('電話'));
+          const phoneIdxB = dataB.headers.findIndex(h => h.includes('電話'));
+          if (phoneIdxA !== -1 && phoneIdxB !== -1) {
+            for (const b of bList) {
+              if (normalize(a.row[phoneIdxA]) === normalize(b.row[phoneIdxB])) {
+                fuzzyMatch = b;
+                break;
+              }
+            }
+          }
+          if (fuzzyMatch) break;
+        }
+
+        if (fuzzyMatch) {
+          const diffs = compareRows(a.row, fuzzyMatch.row, colMap, priceTable);
+          diffs.unshift('キー列の表記ゆれ: 「' + a.row[idxA_keys[0]] + '」↔「' + fuzzyMatch.row[idxB_keys[0]] + '」');
+          results.push({
+            type: diffs.some(d => d.includes('要確認')) ? 'check' : 'diff',
+            rowA: a.row,
+            rowB: fuzzyMatch.row,
+            reasons: diffs
+          });
+          matchedB.add(makeKey(fuzzyMatch.row, idxB_keys));
+        } else {
+          results.push({
+            type: 'only-a',
+            rowA: a.row,
+            rowB: null,
+            reasons: ['表Aにのみ存在']
+          });
+        }
+      }
+    } else if (aRows.length === 1 && bRows.length === 1) {
+      matchedB.add(key);
+      const diffs = compareRows(aRows[0].row, bRows[0].row, colMap, priceTable);
+      if (diffs.length === 0) {
+        results.push({ type: 'ok', rowA: aRows[0].row, rowB: bRows[0].row, reasons: ['一致'] });
+      } else {
+        results.push({
+          type: diffs.some(d => d.includes('要確認')) ? 'check' : 'diff',
+          rowA: aRows[0].row,
+          rowB: bRows[0].row,
+          reasons: diffs
+        });
+      }
+    } else {
+      matchedB.add(key);
+      const phoneIdxA = dataA.headers.findIndex(h => h.includes('電話'));
+      const phoneIdxB = dataB.headers.findIndex(h => h.includes('電話'));
+      const usedB = new Set();
+      for (const a of aRows) {
+        let bestB = null;
+        if (phoneIdxA !== -1 && phoneIdxB !== -1) {
+          bestB = bRows.find((b, i) => !usedB.has(i) && normalize(a.row[phoneIdxA]) === normalize(b.row[phoneIdxB]));
+          if (bestB) usedB.add(bRows.indexOf(bestB));
+        }
+
+        if (bestB) {
+          const diffs = compareRows(a.row, bestB.row, colMap, priceTable);
+          diffs.unshift('同姓同名あり（電話番号で区別）');
+          results.push({
+            type: diffs.length <= 1 ? 'ok' : (diffs.some(d => d.includes('要確認')) ? 'check' : 'diff'),
+            rowA: a.row,
+            rowB: bestB.row,
+            reasons: diffs.length <= 1 ? ['一致（同姓同名あり・電話番号で区別）'] : diffs
+          });
+        } else {
+          // Check if all B rows for this name are already used
+          const allBUsed = usedB.size >= bRows.length;
+          if (allBUsed) {
+            // More A rows than B rows — this person has no matching payment
+            results.push({
+              type: 'only-a',
+              rowA: a.row,
+              rowB: null,
+              reasons: ['表Aにのみ存在（同姓同名の別人分）']
+            });
+          } else {
+            results.push({
+              type: 'check',
+              rowA: a.row,
+              rowB: null,
+              reasons: ['同姓同名が複数あり、どの入金と対応するか判断できません【要確認】']
+            });
+          }
+        }
+      }
+    }
+  }
+
+  // Only in B
+  const categoryKeywords = ['コース', 'カテゴリ', '種別', 'type', 'course', 'plan'];
+  const amountKeywords = ['金額', '料金', '価格', '合計', 'amount', 'price'];
+  for (const [key, bRows] of Object.entries(groupB)) {
+    if (!matchedB.has(key)) {
+      for (const b of bRows) {
+        const reasons = ['表Bにのみ存在'];
+        if (Object.keys(priceTable).length > 0) {
+          const courseIdxB = dataB.headers.findIndex(h => categoryKeywords.some(k => h.includes(k)));
+          const amountIdxB = dataB.headers.findIndex(h => amountKeywords.some(k => h.includes(k)));
+          if (courseIdxB !== -1 && amountIdxB !== -1) {
+            const courseB = b.row[courseIdxB] || '';
+            const actual = Number(b.row[amountIdxB]);
+            const expected = priceTable[courseB];
+            if (expected && !isNaN(actual) && expected !== actual) {
+              const diff = actual - expected;
+              const label = diff > 0 ? '過多 (+' + diff.toLocaleString() + '円)' : '過少 (' + diff.toLocaleString() + '円)';
+              reasons.push('金額' + label + ': ' + courseB + '=' + expected.toLocaleString() + '円のはずが' + actual.toLocaleString() + '円【要確認】');
+            }
+          }
+        }
+        results.push({ type: 'only-b', rowA: null, rowB: b.row, reasons });
+      }
+    }
+  }
+
+  // Classify each result (Step 3: triage)
+  results.forEach(r => {
+    const c = classifyResult(r);
+    r.severity = c.severity;
+    r.category = c.category;
+    r.action = c.action;
+  });
+
+  // Sort by severity (critical → warning → info → ok)
+  const sevOrder = { 'critical': 0, 'warning': 1, 'info': 2, 'ok': 3 };
+  results.sort((a, b) => sevOrder[a.severity] - sevOrder[b.severity]);
+
+  setPipelineStep(3);
+  renderResults(results, colMap);
+}
+
+function compareRows(rowA, rowB, colMap, priceTable) {
+  const diffs = [];
+  const categoryKeywords = ['コース', 'カテゴリ', '種別', 'type', 'course', 'plan'];
+  const amountKeywords = ['金額', '料金', '価格', '合計', 'amount', 'price'];
+
+  for (let i = 0; i < dataA.headers.length; i++) {
+    const ha = dataA.headers[i];
+    const hb = colMap[ha];
+    if (!hb) continue;
+    const jb = dataB.headers.indexOf(hb);
+    if (jb === -1) continue;
+
+    const va = rowA[i] || '';
+    const vb = rowB[jb] || '';
+
+    if (va === vb) continue; // exact match
+    if (normalize(va) === normalize(vb)) {
+      diffs.push(ha + ': 表記ゆれ「' + va + '」↔「' + vb + '」');
+      continue;
+    }
+    if (kanjiNormalize(va) === kanjiNormalize(vb)) {
+      diffs.push(ha + ': 表記ゆれ「' + va + '」↔「' + vb + '」');
+      continue;
+    }
+
+    const phoneKeywords = ['電話', 'TEL', 'tel'];
+    if (phoneKeywords.some(k => ha.includes(k) || (hb && hb.includes(k)))) {
+      const phonePattern = /^[\d\-()+ ]+$/;
+      if (!phonePattern.test(vb) && vb.length > 0) {
+        diffs.push(ha + ': 電話列に電話番号でない値「' + vb + '」が入っています【要確認】');
+        continue;
+      }
+    }
+
+    diffs.push(ha + ': 値が異なる「' + va + '」↔「' + vb + '」【要確認】');
+  }
+
+  // Price check: use B's own columns directly
+  if (rowB && Object.keys(priceTable).length > 0) {
+    const courseIdxB = dataB.headers.findIndex(h => categoryKeywords.some(k => h.includes(k)));
+    const amountIdxB = dataB.headers.findIndex(h => amountKeywords.some(k => h.includes(k)));
+    if (courseIdxB !== -1 && amountIdxB !== -1) {
+      const courseB = rowB[courseIdxB] || '';
+      const actual = Number(rowB[amountIdxB]);
+      const expected = priceTable[courseB];
+      if (expected && !isNaN(actual) && expected !== actual) {
+        const diff = actual - expected;
+        const label = diff > 0 ? '過多 (+' + diff.toLocaleString() + '円)' : '過少 (' + diff.toLocaleString() + '円)';
+        diffs.push('金額' + label + ': ' + courseB + '=' + expected.toLocaleString() + '円のはずが' + actual.toLocaleString() + '円【要確認】');
+      }
+    }
+  }
+
+  return diffs;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Render results with triage
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderResults(results, colMap) {
+  lastResults = results;
+  lastColMap = colMap;
+  const container = document.getElementById('results');
+  const triageSummary = document.getElementById('triageSummary');
+  const categoryBreakdown = document.getElementById('categoryBreakdown');
+  const thead = document.getElementById('resultHead');
+  const tbody = document.getElementById('resultBody');
+
+  // Triage summary (severity-based)
+  const sevCounts = { critical: 0, warning: 0, info: 0, ok: 0 };
+  results.forEach(r => sevCounts[r.severity]++);
+
+  const sevLabels = {
+    critical: ['要対応', 't-critical'],
+    warning: ['要確認', 't-warning'],
+    info: ['軽微', 't-info'],
+    ok: ['一致', 't-ok'],
+  };
+
+  triageSummary.innerHTML = Object.entries(sevLabels).map(([sev, [label, cls]]) => {
+    if (sevCounts[sev] === 0 && sev !== 'ok') return '';
+    return '<div class="triage-card ' + cls + '">' +
+      '<span class="sev-dot sev-dot-' + sev + '"></span>' +
+      '<span class="triage-num">' + sevCounts[sev] + '</span>' +
+      label + '</div>';
+  }).join('');
+
+  // Category breakdown
+  const catCounts = {};
+  results.forEach(r => {
+    if (r.severity === 'ok') return;
+    catCounts[r.category] = (catCounts[r.category] || 0) + 1;
+  });
+
+  categoryBreakdown.innerHTML = Object.entries(catCounts)
+    .map(([cat, n]) => '<span class="cat-tag">' + cat + ' ' + n + '</span>')
+    .join('');
+
+  // Table
+  const allCols = ['', '判定', ...dataA.headers, '｜', ...dataB.headers, '理由', '対応'];
+  thead.innerHTML = '<tr>' + allCols.map(c => '<th>' + c + '</th>').join('') + '</tr>';
+
+  tbody.innerHTML = '';
+  const typeLabels = {
+    'ok': ['一致', 'badge-ok'],
+    'only-a': ['表Aのみ', 'badge-only-a'],
+    'only-b': ['表Bのみ', 'badge-only-b'],
+    'diff': ['表記ゆれ', 'badge-diff'],
+    'check': ['要確認', 'badge-check'],
+  };
+
+  results.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.className = 'row-' + r.type;
+    const [label, badgeClass] = typeLabels[r.type];
+
+    // Severity dot
+    let cells = '<td><span class="sev-dot sev-dot-' + r.severity + '" title="' + r.category + '"></span></td>';
+
+    // Type badge
+    cells += '<td><span class="badge ' + badgeClass + '">' + label + '</span></td>';
+
+    // A columns
+    for (let i = 0; i < dataA.headers.length; i++) {
+      cells += '<td>' + (r.rowA ? (r.rowA[i] || '') : '') + '</td>';
+    }
+    cells += '<td style="color:var(--fg-muted)">│</td>';
+
+    // B columns
+    for (let i = 0; i < dataB.headers.length; i++) {
+      cells += '<td>' + (r.rowB ? (r.rowB[i] || '') : '') + '</td>';
+    }
+
+    // Reasons
+    cells += '<td class="reason">' + r.reasons.join('<br>') + '</td>';
+
+    // Action
+    if (r.severity === 'ok') {
+      cells += '<td></td>';
+    } else {
+      cells += '<td><span class="action-tag action-' + r.severity + '">' + r.action + '</span></td>';
+    }
+
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+
+  container.classList.add('show');
+  container.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Download / Copy results
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let lastResults = null;
+let lastColMap = null;
+
+function buildResultsText(sep) {
+  if (!lastResults || !dataA || !dataB) return '';
+  const headers = ['深刻度', '判定', ...dataA.headers, '│', ...dataB.headers, '理由', '対応候補'];
+  const rows = [headers.join(sep)];
+
+  const sevLabelsJa = { critical: '要対応', warning: '要確認', info: '軽微', ok: '一致' };
+  const typeLabelsJa = { ok: '一致', 'only-a': '表Aのみ', 'only-b': '表Bのみ', diff: '表記ゆれ', check: '要確認' };
+
+  for (const r of lastResults) {
+    const cells = [
+      sevLabelsJa[r.severity] || r.severity,
+      typeLabelsJa[r.type] || r.type,
+    ];
+    for (let i = 0; i < dataA.headers.length; i++) {
+      cells.push(r.rowA ? (r.rowA[i] || '') : '');
+    }
+    cells.push('│');
+    for (let i = 0; i < dataB.headers.length; i++) {
+      cells.push(r.rowB ? (r.rowB[i] || '') : '');
+    }
+    cells.push(r.reasons.join(' / '));
+    cells.push(r.severity === 'ok' ? '' : (r.action || ''));
+
+    // CSV: quote cells containing sep or quotes
+    if (sep === ',') {
+      rows.push(cells.map(c => {
+        if (c.includes(',') || c.includes('"') || c.includes('\n')) {
+          return '"' + c.replace(/"/g, '""') + '"';
+        }
+        return c;
+      }).join(','));
+    } else {
+      rows.push(cells.join(sep));
+    }
+  }
+  return rows.join('\n');
+}
+
+function copyResultsToClipboard() {
+  const text = buildResultsText('\t');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btnCopy');
+    btn.classList.add('copied');
+    btn.textContent = '✓ コピーしました';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '📋 コピー';
+    }, 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('btnCopy');
+    btn.classList.add('copied');
+    btn.textContent = '✓ コピーしました';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '📋 コピー';
+    }, 2000);
+  });
+}
+</script>
+
+</body></html>
